@@ -1,0 +1,29 @@
+{
+  "name": "generate-corpus",
+  "version": "0.0.1",
+  "description": "Generate a corpus based on a Google search of a set of urls",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/christophebe/generate-corpus"
+  },
+  "dependencies": {
+    "async": "*",
+    "cheerio": "*",
+    "detect-character-encoding": "*",
+    "iconv-lite": "*",
+    "natural-content": "*",
+    "request": "*",
+    "serp": "*",
+    "simple-proxies": "*",
+    "underscore": "*",
+    "unfluff": "*"
+  },
+  "devDependencies": {
+    "mocha": "*",
+    "expect": "*",
+    "numeraljs": "*"
+  },
+  "author": "Christophe Lombart",
+  "license": "Apache"
+}
