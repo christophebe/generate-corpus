@@ -27,16 +27,16 @@ var options = {
     host : "google.be",
     qs: {
         q: "courtier crédit",
-        num : 5
+        num : 15
     },
     nbrGrams : 1,
-    withStopWords : true,
+    withStopWords : false,
     language : 'fr'
     //,proxy
 };
 
 
-describe("Natural Content", function() {
+describe("Generate corpus", function() {
 
 
   it('Generate Corpus', function(done) {
@@ -47,6 +47,11 @@ describe("Natural Content", function() {
           console.log(error);
           done();
         }
+
+        console.log(corpus);
+        console.log("----------------------------------------------");
+        console.log(corpus.stats.words['prêt']);
+        console.log("----------------------------------------------");
         var result = [];
         _.keys(corpus.stats.words).forEach(function(word) {
           result.push({word : word,
