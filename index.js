@@ -86,7 +86,7 @@ function googleSearch(options, callback) {
 }
 
 /**
- *  Generate a corpus in fonction of a google SERP or a set of URLs
+ *  Generate a corpus in function of a google SERP or a set of URLs
  *
  * @param options, a json structure with the following strucure :
  *

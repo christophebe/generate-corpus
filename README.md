@@ -36,7 +36,7 @@ search.generateCorpus(options, function(error, corpus){
     }
 
     console.log(corpus);
-
+});
 ```
 
 # Build a corpus from a set of URLs
@@ -58,7 +58,7 @@ search.generateCorpus(options, function(error, corpus){
     }
 
     console.log(corpus);
-
+});
 ```
 
 # Data structure
@@ -69,7 +69,7 @@ search.generateCorpus(options, function(error, corpus){
    numberOfDocs: 10, // number of analyzed documents
    stats: {
      // The number of documents for each word
-     // The array index matches to the found expression
+     // The array index matches to the found expressions
      nbrDocsByWords:[
        'prêt': 9,
         immobilier: 10,
@@ -110,7 +110,7 @@ search.generateCorpus(options, function(error, corpus){
 
 }
 ```
-See the unit test to know to sort the word list.
+See the unit test to know how to sort the word list.
 
 
 # TODO
