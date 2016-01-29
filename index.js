@@ -63,6 +63,7 @@ function loadContents(urls, language, endCallback) {
     var tasks = _.map(urls, function(url){ return function(callback){ loadContent(url, language, callback);}; });
 
     async.parallel(tasks, function(error, results){
+        console.log("End of loading all contents");
         endCallback(error, results);
     });
 }
@@ -123,6 +124,11 @@ module.exports.generateCorpus = function(options, callback) {
               callback(null, options.urls);
             }
             else {
+              // Make sure that the language is also set for the google search
+              if (options.language) {
+                options.qs.hl = options.language;
+              }
+
               googleSearch(options, callback);
             }
         },
@@ -130,8 +136,8 @@ module.exports.generateCorpus = function(options, callback) {
             loadContents(urls, options.language, callback);
         },
         function(contents, callback) {
-            console.log("Compute TF.IDF");
-            callback(null, natural.getTfIdfs(contents, options.nrbGrams, options.withStopWords));
+            
+            callback(null, natural.getTfIdfs(contents, options.nbrGrams, options.withStopWords, options.language));
         }
     ], function (error, corpus) {
         callback(error, corpus);
