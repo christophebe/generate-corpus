@@ -10,83 +10,6 @@ var detectEncoding = require('detect-character-encoding');
 
 
 /**
- *  Load the main content of an HTML page without Ads, sidebars, ...
- *
- * @param The url matching to the content
- * @param the target language
- * @param callback(error, content) - String, content converted in the correct encofing
- */
-function loadContent (url, language, endCallback) {
-    console.log("Read content : " + url);
-    async.waterfall([
-          function(callback) {
-            // encoding is null in order to get the response as buffer instead of String
-            request({uri: url, encoding: null} ,function (error, response, body) {
-
-                  if (error) {
-                    console.log("Impossible to load the content for : " + url + " - error : " + error);
-
-                    // Don't stop the process to load all contents
-                    return callback(null, "");
-                  }
-
-                  if (response.statusCode === 200) {
-                    var charsetMatch = detectEncoding(body);
-                    callback(null, iconv.decode(body, charsetMatch.encoding));
-                  }
-                  else {
-                    console.log("Impossible to load the content for : " + url + " - Http status : " + response.statusCode);
-                    // Don't stop the process to load all contents
-                    return callback(null, "");
-
-                  }
-            });
-          },
-          function(htmlContent, callback) {
-              var data = extractor(htmlContent, language);
-              callback(null, data.text);
-          }
-      ], function (error, cleanContent) {
-          endCallback(error, cleanContent);
-      });
-
-}
-
-/**
- *  Load the content from the SERP urls
- *
- * @param an array of url matching to the result SERP pages
- * @param callback(error, contents) - an arrays of content (Strings)
- */
-function loadContents(urls, language, endCallback) {
-
-    var tasks = _.map(urls, function(url){ return function(callback){ loadContent(url, language, callback);}; });
-
-    async.parallel(tasks, function(error, results){
-        console.log("End of loading all contents");
-        endCallback(error, results);
-    });
-}
-
-/**
- * Search on Google for a specific keyword
- *
- *
- * @param options : the usual option for the serp module : https://github.com/christophebe/serp
- * @param callback(error, urls) urls is an array of url matching to the keyword SERP
- */
-
-function googleSearch(options, callback) {
-    console.log("Search on " + options.host + " for '" + options.qs.q + "' - nbr of results : " + options.qs.num);
-
-    serp.search(options, function(error, urls) {
-          //console.log("find urls : ", urls);
-          callback(error, urls);
-    });
-
-}
-
-/**
  *  Generate a corpus in function of a google SERP or a set of URLs
  *
  * @param options, a json structure with the following strucure :
@@ -133,14 +56,123 @@ module.exports.generateCorpus = function(options, callback) {
             }
         },
         function(urls, callback) {
+
             loadContents(urls, options.language, callback);
         },
         function(contents, callback) {
-            
-            callback(null, natural.getTfIdfs(contents, options.nbrGrams, options.withStopWords, options.language));
+            console.log("Calculate the tf.idf ....");
+            if ( _.isArray(options.nbrGrams)) {
+              callback(null,
+                _.map(options.nbrGrams, function(nbrGrams) { return natural.getTfIdfs(contents, nbrGrams, options.withStopWords, options.language);}));
+            }
+            else {
+              callback(null, natural.getTfIdfs(contents, options.nbrGrams, options.withStopWords, options.language));
+            }
+
         }
     ], function (error, corpus) {
         callback(error, corpus);
     });
 
 };
+
+/**
+ * Search on Google for a specific keyword
+ *
+ *
+ * @param options : the usual option for the serp module : https://github.com/christophebe/serp
+ * @param callback(error, urls) urls is an array of url matching to the keyword SERP
+ */
+
+function googleSearch(options, callback) {
+
+    console.log("Search on " + options.host + " for '" + options.qs.q + "' - nbr of results : " + options.qs.num);
+
+    // if the q parameter is an arrays of keyword
+    // => execute a google search of all of them and group all url in one array
+    if (_.isArray(options.qs.q)) {
+
+        var tasks = _.map(options.qs.q, function(q) { return createTask(q, options);});
+
+        async.parallel(tasks, function(error, results){
+            callback(error, _.uniq(_.flatten(results)));
+        });
+
+    }
+    // The q parameter is a simple keyword
+    // => make just one search on google with this keyword
+    else {
+      serp.search(options, function(error, urls) {
+              //console.log("find urls : ", urls);
+              callback(error, urls);
+        });
+    }
+
+}
+
+function createTask(q, options) {
+    var o = _.clone(options);
+    o.qs.q = q;
+
+    return async.apply(serp.search,o);
+}
+
+/**
+ *  Load the content from the SERP urls
+ *
+ * @param an array of url matching to the result SERP pages
+ * @param callback(error, contents) - an arrays of content (Strings)
+ */
+function loadContents(urls, language, endCallback) {
+
+    var tasks = _.map(urls, function(url){ return function(callback){ loadContent(url, language, callback);}; });
+
+    async.parallel(tasks, function(error, results){
+        console.log("End of loading all contents");
+        endCallback(error, results);
+    });
+}
+
+
+/**
+ *  Load the main content of an HTML page without Ads, sidebars, ...
+ *
+ * @param The url matching to the content
+ * @param the target language
+ * @param callback(error, content) - String, content converted in the correct encofing
+ */
+function loadContent (url, language, endCallback) {
+    console.log("load content : " + url);
+    async.waterfall([
+          function(callback) {
+            // encoding is null in order to get the response as buffer instead of String
+            request({uri: url, encoding: null} ,function (error, response, body) {
+
+                  if (error) {
+                    console.log("Impossible to load the content for : " + url + " - error : " + error);
+
+                    // Don't stop the process to load all contents
+                    return callback(null, "");
+                  }
+
+                  if (response.statusCode === 200) {
+                    var charsetMatch = detectEncoding(body);
+                    callback(null, iconv.decode(body, charsetMatch.encoding));
+                  }
+                  else {
+                    console.log("Impossible to load the content for : " + url + " - Http status : " + response.statusCode);
+                    // Don't stop the process to load all contents
+                    return callback(null, "");
+
+                  }
+            });
+          },
+          function(htmlContent, callback) {
+              var data = extractor(htmlContent, language);
+              callback(null, data.text);
+          }
+      ], function (error, cleanContent) {
+          endCallback(error, cleanContent);
+      });
+
+}

@@ -24,15 +24,15 @@ numeral.language('fr', {
 numeral.language('fr');
 
 var options = {
-    host : "google.be",
+    host : "google.fr",
     qs: {
-        q: "rachat+crédit",
-        num : 15,
+        q: "dresser+chien",
+        num : 30,
         pws : 0,
-        lr : "lang_fr" //,
+        //lr : "lang_fr" //,
         //cr : "BE"
     },
-    nbrGrams : 2,
+    nbrGrams : [1,2,3],
     withStopWords : false,
     language : 'fr'
     //,proxy
@@ -44,7 +44,7 @@ describe("Generate corpus", function() {
 
 
   it('Generate Corpus', function(done) {
-    this.timeout(100000);
+    this.timeout(1000000);
     search.generateCorpus(options, function(error, corpus){
 
         if (error) {
@@ -52,19 +52,38 @@ describe("Generate corpus", function() {
           done();
         }
 
-        var sorted = _.sortBy(Array.from(corpus.stats.values()), function(word) { return -word.tfIdfSum;});
-
-
         console.log("Word;Nbr Docs;TF Avg;TF Min;TF Max;IDF Avg;TF.IDF Sum;TF.IDF Avg");
-        sorted.forEach(function (word){
-            console.log(word.word + ";" + word.nbrDocs + ";" +
-                          numeral(word.tfAvg).format("0.00")  + ";" +
-                          numeral(word.tfMin).format("0.00")  + ";" +
-                          numeral(word.tfMax).format("0.00")  + ";" +
-                          numeral(word.idfAvg).format("0.00")   + ';' +
-                          numeral(word.tfIdfSum).format("0.00")  + ';' +
-                          numeral(word.tfIdfAvg).format("0.00"));
-        });
+        var sorted = null;
+        if (_.isArray(corpus)) {
+            var allWords = Array.from(corpus[0].stats.values()).concat(Array.from(corpus[1].stats.values()).concat(Array.from(corpus[2].stats.values())));
+            sorted = _.sortBy(allWords, function(word) { return -word.tfIdfSum;});
+
+            sorted.forEach(function (word){
+                  console.log(word.word + ";" + word.nbrDocs + ";" +
+                                numeral(word.tfAvg).format("0.00")  + ";" +
+                                numeral(word.tfMin).format("0.00")  + ";" +
+                                numeral(word.tfMax).format("0.00")  + ";" +
+                                numeral(word.idfAvg).format("0.00")   + ';' +
+                                numeral(word.tfIdfSum).format("0.00")  + ';' +
+                                numeral(word.tfIdfAvg).format("0.00"));
+            });
+        }
+        else {
+          sorted = _.sortBy(Array.from(corpus.status.values()), function(word) { return -word.tfIdfSum;});
+
+          sorted.forEach(function (word){
+                console.log(word.word + ";" + word.nbrDocs + ";" +
+                              numeral(word.tfAvg).format("0.00")  + ";" +
+                              numeral(word.tfMin).format("0.00")  + ";" +
+                              numeral(word.tfMax).format("0.00")  + ";" +
+                              numeral(word.idfAvg).format("0.00")   + ';' +
+                              numeral(word.tfIdfSum).format("0.00")  + ';' +
+                              numeral(word.tfIdfAvg).format("0.00"));
+          });
+        }
+
+
+
         done();
 
   });

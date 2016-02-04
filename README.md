@@ -4,14 +4,14 @@ This module can build a corpus based on a google search or from a set of URLs. T
 
 **Please wait ... still in progress. Your are welcome to contribute or suggest new ideas !**
 
-# Install
+## Install
 
 ```javascript
 npm install generate-corpus --save
 ```
 
 
-# Build a corpus from a google search
+## Build a corpus from a google search
 
 ```javascript
 var corpus = require("generate-corpus");
@@ -53,7 +53,7 @@ corpus.generateCorpus(options, function(error, corpus){
 });
 ```
 
-# Build a corpus from a set of URLs
+## Build a corpus from a set of URLs
 
 ```javascript
 
@@ -75,9 +75,21 @@ search.generateCorpus(options, function(error, corpus){
 });
 ```
 
-# Data structure
+## Understanding the options
 
-The generateCorpus function returns a map with a key matching to the word (or the ngram expression) and with a value based on the following structure :
+In both previous examples, the options object contains differents parameters :
+1. host : the google domain (google.com, google.fr, ... ). Default value : google.com
+2. qs : it used to customize the search on google :
+   q   : it the serch keyword (replace spaces by +).
+   num : the number of the results.
+   For the other possibilities, see this document : https://moz.com/ugc/the-ultimate-guide-to-the-google-search-parameters.
+3. nbrGrams : the ngram compositions (could be a simple value of an array of ngrams, eg. : [1,2,3])
+4. withStopWords : if true, the lexical field will be made with the stop words
+5. language : the language iso code
+
+## Data structure
+
+If the options.nbrGrams is a simple value , the generateCorpus function returns a map with a key matching to the word (or the ngram expression) and with a value based on the following structure :
 
  ```javascript
   {  
@@ -104,6 +116,8 @@ The generateCorpus function returns a map with a key matching to the word (or th
 
 }
 ```
+
+If the options.nbrGrams is an array of ngrams, the generateCorpus return an arrays of map matching to the previous structure. 
 See the unit test for a complete example.
 
 # TODO
