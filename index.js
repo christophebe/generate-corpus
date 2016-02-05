@@ -56,8 +56,7 @@ module.exports.generateCorpus = function(options, callback) {
             }
         },
         function(urls, callback) {
-
-            loadContents(urls, options.language, callback);
+            loadContents(urls, options.language, options.removeSpecials, options.removeDiacritics, callback);
         },
         function(contents, callback) {
             console.log("Calculate the tf.idf ....");
@@ -77,7 +76,7 @@ module.exports.generateCorpus = function(options, callback) {
 };
 
 /**
- * Search on Google for a specific keyword
+ * Search on Google for a specific keyword or a set of keywords
  *
  *
  * @param options : the usual option for the serp module : https://github.com/christophebe/serp
@@ -88,7 +87,7 @@ function googleSearch(options, callback) {
 
     console.log("Search on " + options.host + " for '" + options.qs.q + "' - nbr of results : " + options.qs.num);
 
-    // if the q parameter is an arrays of keyword
+    // if the q parameter is an arrays of keywords
     // => execute a google search of all of them and group all url in one array
     if (_.isArray(options.qs.q)) {
 
@@ -123,9 +122,9 @@ function createTask(q, options) {
  * @param an array of url matching to the result SERP pages
  * @param callback(error, contents) - an arrays of content (Strings)
  */
-function loadContents(urls, language, endCallback) {
+function loadContents(urls, language, removeSpecials, removeDiacritics, endCallback) {
 
-    var tasks = _.map(urls, function(url){ return function(callback){ loadContent(url, language, callback);}; });
+    var tasks = _.map(urls, function(url){ return function(callback){ loadContent(url, language, removeSpecials, removeDiacritics, callback);}; });
 
     async.parallel(tasks, function(error, results){
         console.log("End of loading all contents");
@@ -141,11 +140,13 @@ function loadContents(urls, language, endCallback) {
  * @param the target language
  * @param callback(error, content) - String, content converted in the correct encofing
  */
-function loadContent (url, language, endCallback) {
+function loadContent (url, language, removeSpecials, removeDiacritics, endCallback) {
     console.log("load content : " + url);
     async.waterfall([
           function(callback) {
+
             // encoding is null in order to get the response as buffer instead of String
+            // By this way, we can detect the page encoding
             request({uri: url, encoding: null} ,function (error, response, body) {
 
                   if (error) {
@@ -168,8 +169,15 @@ function loadContent (url, language, endCallback) {
             });
           },
           function(htmlContent, callback) {
-              var data = extractor(htmlContent, language);
-              callback(null, data.text);
+              var content = extractor(htmlContent, language).text;
+              if (removeSpecials) {
+                  content = natural.removeSpecials(content);
+              }
+              if (removeDiacritics) {
+                content = natural.removeDiacritics(content); 
+              }
+
+              callback(null, content);
           }
       ], function (error, cleanContent) {
           endCallback(error, cleanContent);
