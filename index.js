@@ -143,44 +143,53 @@ function loadContents(urls, language, removeSpecials, removeDiacritics, endCallb
 function loadContent (url, language, removeSpecials, removeDiacritics, endCallback) {
     console.log("load content : " + url);
     async.waterfall([
-          function(callback) {
-
-            // encoding is null in order to get the response as buffer instead of String
-            // By this way, we can detect the page encoding
-            request({uri: url, encoding: null} ,function (error, response, body) {
-
-                  if (error) {
-                    console.log("Impossible to load the content for : " + url + " - error : " + error);
-
-                    // Don't stop the process to load all contents
-                    return callback(null, "");
-                  }
-
-                  if (response.statusCode === 200) {
-                    var charsetMatch = detectEncoding(body);
-                    callback(null, iconv.decode(body, charsetMatch.encoding));
-                  }
-                  else {
-                    console.log("Impossible to load the content for : " + url + " - Http status : " + response.statusCode);
-                    // Don't stop the process to load all contents
-                    return callback(null, "");
-
-                  }
-            });
-          },
+          async.apply(httpRequest, url),
           function(htmlContent, callback) {
               var content = extractor(htmlContent, language).text;
               if (removeSpecials) {
                   content = natural.removeSpecials(content);
               }
               if (removeDiacritics) {
-                content = natural.removeDiacritics(content); 
+                content = natural.removeDiacritics(content);
               }
-
+              console.log("End of extracting content : " + url);
               callback(null, content);
           }
       ], function (error, cleanContent) {
           endCallback(error, cleanContent);
       });
 
+}
+
+function httpRequest(url, callback) {
+    // encoding is null in order to get the response as buffer instead of String
+    // By this way, we can detect the page encoding
+    var options = {
+        uri: url,
+        encoding: null,
+        headers: {
+          'User-Agent': 'request.js',
+        }
+    };
+
+    request(options ,function (error, response, body) {
+
+          if (error) {
+            console.log("Impossible to load the content for : " + url + " - error : " + error);
+
+            // Don't stop the process to load all contents
+            return callback(null, "");
+          }
+
+          if (response.statusCode === 200) {
+            var charsetMatch = detectEncoding(body);
+            callback(null, iconv.decode(body, charsetMatch.encoding));
+          }
+          else {
+            console.log("Impossible to load the content for : " + url + " - Http status : " + response.statusCode);
+            // Don't stop the process to load all contents
+            return callback(null, "");
+
+          }
+    });
 }
