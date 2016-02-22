@@ -26,7 +26,7 @@ numeral.language('fr');
 var options = {
     host : "google.be",
     qs: {
-        q: "pret+personnel",
+        q: "chien",
         num : 50,
         pws : 0,
         //lr : "lang_fr" //,
@@ -87,7 +87,7 @@ describe("Generate corpus", function() {
                                 numeral(word.tfIdfSum).format("0.00")  + ';' +
                                 numeral(word.tfIdfAvg).format("0.00"));
             });
-            
+
         }
         else {
 

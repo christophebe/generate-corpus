@@ -8,7 +8,7 @@ var natural        = require("natural-content");
 var iconv          = require("iconv-lite");
 var detectEncoding = require('detect-character-encoding');
 
-
+var DEFAULT_TIME_OUT = 20000;
 /**
  *  Generate a corpus in function of a google SERP or a set of URLs
  *
@@ -56,7 +56,7 @@ module.exports.generateCorpus = function(options, callback) {
             }
         },
         function(urls, callback) {
-            loadContents(urls, options.language, options.removeSpecials, options.removeDiacritics, callback);
+            loadContents(urls, options.language, options.removeSpecials, options.removeDiacritics, options.timeout, callback);
         },
         function(contents, callback) {
             console.log("Calculate the tf.idf ....");
@@ -122,9 +122,9 @@ function createTask(q, options) {
  * @param an array of url matching to the result SERP pages
  * @param callback(error, contents) - an arrays of content (Strings)
  */
-function loadContents(urls, language, removeSpecials, removeDiacritics, endCallback) {
+function loadContents(urls, language, removeSpecials, removeDiacritics, timeout, endCallback) {
 
-    var tasks = _.map(urls, function(url){ return function(callback){ loadContent(url, language, removeSpecials, removeDiacritics, callback);}; });
+    var tasks = _.map(urls, function(url){ return function(callback){ loadContent(url, language, removeSpecials, removeDiacritics, timeout, callback);}; });
 
     async.parallel(tasks, function(error, results){
         console.log("End of loading all contents");
@@ -140,10 +140,10 @@ function loadContents(urls, language, removeSpecials, removeDiacritics, endCallb
  * @param the target language
  * @param callback(error, content) - String, content converted in the correct encofing
  */
-function loadContent (url, language, removeSpecials, removeDiacritics, endCallback) {
+function loadContent (url, language, removeSpecials, removeDiacritics, timeout, endCallback) {
     console.log("load content : " + url);
     async.waterfall([
-          async.apply(httpRequest, url),
+          async.apply(httpRequest, url, timeout),
           function(htmlContent, callback) {
               var content = extractor(htmlContent, language).text;
               if (removeSpecials) {
@@ -152,7 +152,7 @@ function loadContent (url, language, removeSpecials, removeDiacritics, endCallba
               if (removeDiacritics) {
                 content = natural.removeDiacritics(content);
               }
-              console.log("End of extracting content : " + url);
+              //console.log("End of extracting content : " + url);
               callback(null, content);
           }
       ], function (error, cleanContent) {
@@ -161,7 +161,7 @@ function loadContent (url, language, removeSpecials, removeDiacritics, endCallba
 
 }
 
-function httpRequest(url, callback) {
+function httpRequest(url, timeout, callback) {
     // encoding is null in order to get the response as buffer instead of String
     // By this way, we can detect the page encoding
     var options = {
@@ -169,7 +169,13 @@ function httpRequest(url, callback) {
         encoding: null,
         headers: {
           'User-Agent': 'request.js',
-        }
+        },
+        // For HTTPS requests
+        // Some old servers do not support recent TSL version
+        secureOptions: require('constants').SSL_OP_NO_TLSv1_2,
+        rejectUnauthorized : false,
+
+        timeout : timeout ?  timeout : DEFAULT_TIME_OUT,
     };
 
     request(options ,function (error, response, body) {
@@ -188,8 +194,8 @@ function httpRequest(url, callback) {
           else {
             console.log("Impossible to load the content for : " + url + " - Http status : " + response.statusCode);
             // Don't stop the process to load all contents
-            return callback(null, "");
+            callback(null, "");
 
           }
-    });
+    }).setMaxListeners(0);
 }
