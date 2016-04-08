@@ -9,6 +9,7 @@ var iconv          = require("iconv-lite");
 var detectEncoding = require('detect-character-encoding');
 
 var DEFAULT_TIME_OUT = 20000;
+var DEFAULT_USER_AGENT = 'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:40.0) Gecko/20100101 Firefox/40.1';
 /**
  *  Generate a corpus in function of a google SERP or a set of URLs
  *
@@ -85,7 +86,7 @@ module.exports.generateCorpus = function(options, callback) {
 
 function googleSearch(options, callback) {
 
-    console.log("Search on " + options.host + " for '" + options.qs.q + "' - nbr of results : " + options.qs.num);
+    console.log("Search on " + options.host + " for '" + options.qs.q + "' - nbr of results : " + options.num);
 
     // if the q parameter is an arrays of keywords
     // => execute a google search of all of them and group all url in one array
@@ -165,11 +166,9 @@ function httpRequest(url, timeout, callback) {
     // encoding is null in order to get the response as buffer instead of String
     // By this way, we can detect the page encoding
     var options = {
-        uri: url,
-        encoding: null,
-        headers: {
-          'User-Agent': 'request.js',
-        },
+        uri : url,
+        encoding : null,
+        headers : {"User-Agent" : DEFAULT_USER_AGENT},
         // For HTTPS requests
         // Some old servers do not support recent TSL version
         secureOptions: require('constants').SSL_OP_NO_TLSv1_2,

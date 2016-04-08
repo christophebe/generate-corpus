@@ -23,11 +23,12 @@ numeral.language('fr', {
 
 numeral.language('fr');
 
+
 var options = {
     host : "google.be",
+    num : 30,
     qs: {
-        q: "chien",
-        num : 50,
+        q: "dresser chien",
         pws : 0,
         //lr : "lang_fr" //,
         //cr : "BE"
@@ -56,24 +57,8 @@ describe("Generate corpus", function() {
 
         console.log("Word;Nbr Docs;TF Avg;TF Min;TF Max;IDF Avg;TF.IDF Sum;TF.IDF Avg");
         var sorted = null;
+        // if ngrGrams is an array
         if (_.isArray(corpus)) {
-            /*
-            corpus.forEach(function (c){
-                console.log("----------------------------------------------------------------------------------");
-                sorted = _.sortBy(Array.from(c.stats.values()), function(word) { return -word.tfIdfSum;});
-
-                sorted.forEach(function (word){
-                      console.log(word.word + ";" + word.nbrDocs + ";" +
-                                    numeral(word.tfAvg).format("0.00")  + ";" +
-                                    numeral(word.tfMin).format("0.00")  + ";" +
-                                    numeral(word.tfMax).format("0.00")  + ";" +
-                                    numeral(word.idfAvg).format("0.00")   + ';' +
-                                    numeral(word.tfIdfSum).format("0.00")  + ';' +
-                                    numeral(word.tfIdfAvg).format("0.00"));
-                });
-
-            });
-            */
 
             var allWords = Array.from(corpus[0].stats.values()).concat(Array.from(corpus[1].stats.values()).concat(Array.from(corpus[2].stats.values())));
             sorted = _.sortBy(allWords, function(word) { return -word.tfIdfSum;});

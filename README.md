@@ -19,9 +19,9 @@ var _      = require("underscore");
 
 var options = {
     host : "google.be",
+    num : 15,
     qs: {
         q: "rachat+crédit",
-        num : 15,
         pws : 0,
         //lr : "lang_fr",
         //cr : "BE"
@@ -78,18 +78,18 @@ search.generateCorpus(options, function(error, corpus){
 ## Understanding the options
 
 In both previous examples, the options object contains differents parameters :
-1. host : the google domain (google.com, google.fr, ... ). Default value : google.com
-2. qs : it used to customize the search on google :
+1. host : the google domain (google.com, google.fr, ... ). Default value : google.com.
+2. num : the number of of pages when the corpus is build from a google search.
+3. qs : it used to customize the search on google :
    q   : it the serch keyword (replace spaces by +).
-   num : the number of the results.
    For the other possibilities, see this document : https://moz.com/ugc/the-ultimate-guide-to-the-google-search-parameters.
-3. nbrGrams : the ngram compositions (could be a simple value of an array of ngrams, eg. : [1,2,3])
-4. withStopWords : if true, the lexical field will be made with the stop words
-5. language : the language iso code
+4. nbrGrams : the ngram compositions (could be a simple value of an array of ngrams, eg. : [1,2,3]).
+5. withStopWords : if true, the lexical field will be made with the stop words.
+6. language : the language iso code
 
 ## Data structure
 
-If the options.nbrGrams is a simple value , the generateCorpus function returns a map with a key matching to the word (or the ngram expression) and with a value based on the following structure :
+*If the options.nbrGrams is a simple value* , the generateCorpus function returns a map with a key matching to the word (or the ngram expression) and with a value based on the following structure :
 
  ```javascript
   {  
@@ -117,7 +117,7 @@ If the options.nbrGrams is a simple value , the generateCorpus function returns 
 }
 ```
 
-If the options.nbrGrams is an array of ngrams, the generateCorpus return an arrays of map matching to the previous structure. 
+*If the options.nbrGrams is an array of ngrams*, the generateCorpus return an arrays of map matching to the previous structure.
 See the unit test for a complete example.
 
 # TODO
