@@ -7,6 +7,7 @@ var request        = require("request");
 var natural        = require("natural-content");
 var iconv          = require("iconv-lite");
 var detectEncoding = require('detect-character-encoding');
+var log            = require("crawler-ninja-logger").Logger;
 
 var DEFAULT_TIME_OUT = 20000;
 var DEFAULT_USER_AGENT = 'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:40.0) Gecko/20100101 Firefox/40.1';
@@ -60,7 +61,8 @@ module.exports.generateCorpus = function(options, callback) {
             loadContents(urls, options.language, options.removeSpecials, options.removeDiacritics, options.timeout, callback);
         },
         function(contents, callback) {
-            console.log("Calculate the tf.idf ....");
+            logInfo("Calculate the tf.idf ....", options);
+
             if ( _.isArray(options.nbrGrams)) {
               callback(null,
                 _.map(options.nbrGrams, function(nbrGrams) { return natural.getTfIdfs(contents, nbrGrams, options.withStopWords, options.language);}));
@@ -86,7 +88,7 @@ module.exports.generateCorpus = function(options, callback) {
 
 function googleSearch(options, callback) {
 
-    console.log("Search on " + options.host + " for '" + options.qs.q + "' - nbr of results : " + options.num);
+    logInfo("Search on " + options.host + " for '" + options.qs.q + "' - nbr of results : " + options.num, options);
 
     // if the q parameter is an arrays of keywords
     // => execute a google search of all of them and group all url in one array
@@ -103,7 +105,6 @@ function googleSearch(options, callback) {
     // => make just one search on google with this keyword
     else {
       serp.search(options, function(error, urls) {
-              //console.log("find urls : ", urls);
               callback(error, urls);
         });
     }
@@ -128,7 +129,6 @@ function loadContents(urls, language, removeSpecials, removeDiacritics, timeout,
     var tasks = _.map(urls, function(url){ return function(callback){ loadContent(url, language, removeSpecials, removeDiacritics, timeout, callback);}; });
 
     async.parallel(tasks, function(error, results){
-        console.log("End of loading all contents");
         endCallback(error, results);
     });
 }
@@ -142,7 +142,7 @@ function loadContents(urls, language, removeSpecials, removeDiacritics, timeout,
  * @param callback(error, content) - String, content converted in the correct encofing
  */
 function loadContent (url, language, removeSpecials, removeDiacritics, timeout, endCallback) {
-    console.log("load content : " + url);
+    logInfo("load content : " + url);
     async.waterfall([
           async.apply(httpRequest, url, timeout),
           function(htmlContent, callback) {
@@ -153,7 +153,7 @@ function loadContent (url, language, removeSpecials, removeDiacritics, timeout, 
               if (removeDiacritics) {
                 content = natural.removeDiacritics(content);
               }
-              //console.log("End of extracting content : " + url);
+
               callback(null, content);
           }
       ], function (error, cleanContent) {
@@ -180,7 +180,7 @@ function httpRequest(url, timeout, callback) {
     request(options ,function (error, response, body) {
 
           if (error) {
-            console.log("Impossible to load the content for : " + url + " - error : " + error);
+            logError("Impossible to load the content" , options, error);
 
             // Don't stop the process to load all contents
             return callback(null, "");
@@ -191,10 +191,19 @@ function httpRequest(url, timeout, callback) {
             callback(null, iconv.decode(body, charsetMatch.encoding));
           }
           else {
-            console.log("Impossible to load the content for : " + url + " - Http status : " + response.statusCode);
+            logError("Impossible to load the content for : " + url + " - Http status : " + response.statusCode, options);
             // Don't stop the process to load all contents
             callback(null, "");
 
           }
     }).setMaxListeners(0);
+}
+
+
+function logInfo(message, options) {
+  log.info({module : "generate-corpus", message : message, options : options});
+}
+
+function logError(message, options, error) {
+  log.error({module : "generate-corpus", message : message, options : options, error : error});
 }

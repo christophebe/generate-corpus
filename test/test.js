@@ -28,7 +28,7 @@ var options = {
     host : "google.be",
     num : 30,
     qs: {
-        q: "dresser chien",
+        q: "crédit auto belgique",
         pws : 0,
         //lr : "lang_fr" //,
         //cr : "BE"
