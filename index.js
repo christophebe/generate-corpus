@@ -125,7 +125,7 @@ function createTask(q, options) {
  * @param callback(error, contents) - an arrays of content (Strings)
  */
 function loadContents(urls, language, removeSpecials, removeDiacritics, timeout, endCallback) {
-
+    logInfo("nnumber of URLs found : " + urls.length);
     var tasks = _.map(urls, function(url){ return function(callback){ loadContent(url, language, removeSpecials, removeDiacritics, timeout, callback);}; });
 
     async.parallel(tasks, function(error, results){
@@ -142,11 +142,16 @@ function loadContents(urls, language, removeSpecials, removeDiacritics, timeout,
  * @param callback(error, content) - String, content converted in the correct encofing
  */
 function loadContent (url, language, removeSpecials, removeDiacritics, timeout, endCallback) {
-    logInfo("load content : " + url);
+
+
     async.waterfall([
           async.apply(httpRequest, url, timeout),
           function(htmlContent, callback) {
-              var content = extractor(htmlContent, language).text;
+
+              var content = removeHTMLTags(htmlContent);
+
+              content = extractor(content, language).text;
+
               if (removeSpecials) {
                   content = natural.removeSpecials(content);
               }
@@ -163,6 +168,7 @@ function loadContent (url, language, removeSpecials, removeDiacritics, timeout, 
 }
 
 function httpRequest(url, timeout, callback) {
+
     // encoding is null in order to get the response as buffer instead of String
     // By this way, we can detect the page encoding
     var options = {
@@ -187,6 +193,7 @@ function httpRequest(url, timeout, callback) {
           }
 
           if (response.statusCode === 200) {
+            logInfo("HTTP Request done", url);
             var charsetMatch = detectEncoding(body);
             callback(null, iconv.decode(body, charsetMatch.encoding));
           }
@@ -199,6 +206,15 @@ function httpRequest(url, timeout, callback) {
     }).setMaxListeners(0);
 }
 
+function removeHTMLTags(htmlContent) {
+  // Some HTML code can contain some tags that are not managed by unfluff
+  // Big workaround/hack until we find a better solution
+  // => replace thoses tags by a space
+  var content = htmlContent.replace(/(<b([^>]+)>)/ig, " ")
+                           .replace(/(<option([^>]+)>)/ig, " ");
+
+  return content;
+}
 
 function logInfo(message, options) {
   log.info({module : "generate-corpus", message : message, options : options});

@@ -1,6 +1,7 @@
-var search  = require("../index.js");
-var _       = require("underscore");
-var numeral = require("numeraljs");
+var search    = require("../index.js");
+var _         = require("underscore");
+var numeral   = require("numeraljs");
+var extractor = require("unfluff");
 
 numeral.language('fr', {
     delimiters: {
@@ -25,15 +26,15 @@ numeral.language('fr');
 
 
 var options = {
-    host : "google.be",
-    num : 30,
+    host : "google.fr",
+    num : 20,
     qs: {
-        q: "crédit auto belgique",
+        q: "comment choisir un champagne",
         pws : 0,
         //lr : "lang_fr" //,
         //cr : "BE"
     },
-    nbrGrams : [1,2,3],
+    nbrGrams : 1,
     withStopWords : false,
     language : 'fr',
     removeSpecials : true,
@@ -45,6 +46,12 @@ var options = {
 
 describe("Generate corpus", function() {
 
+  it.skip('get test', function(){
+      var content = "<html><body><p>Conditions d'utilisation<b class='hideforacc'>du Service de livraison internationale - la page s'ouvre dans une nouvelle fenêtre ou un nouvel onglet</b></p></body></html>";
+      content = content.replace(/(<b([^>]+)>)/ig, " ");
+      content = extractor(content, "fr").text;
+      console.log(">>", content);
+  });
 
   it('Generate Corpus', function(done) {
     this.timeout(1000000);
@@ -64,13 +71,16 @@ describe("Generate corpus", function() {
             sorted = _.sortBy(allWords, function(word) { return -word.tfIdfSum;});
 
             sorted.forEach(function (word){
-                  console.log(word.word + ";" + word.nbrDocs + ";" +
-                                numeral(word.tfAvg).format("0.00")  + ";" +
-                                numeral(word.tfMin).format("0.00")  + ";" +
-                                numeral(word.tfMax).format("0.00")  + ";" +
-                                numeral(word.idfAvg).format("0.00")   + ';' +
-                                numeral(word.tfIdfSum).format("0.00")  + ';' +
-                                numeral(word.tfIdfAvg).format("0.00"));
+                  //if (word.nbrDocs > 1) {
+                    console.log(word.word + ";" + word.nbrDocs + ";" +
+                                  numeral(word.tfAvg).format("0.00")  + ";" +
+                                  numeral(word.tfMin).format("0.00")  + ";" +
+                                  numeral(word.tfMax).format("0.00")  + ";" +
+                                  numeral(word.idfAvg).format("0.00")   + ';' +
+                                  numeral(word.tfIdfSum).format("0.00")  + ';' +
+                                  numeral(word.tfIdfAvg).format("0.00"));
+                  //}
+
             });
 
         }
@@ -79,13 +89,15 @@ describe("Generate corpus", function() {
             sorted = _.sortBy(Array.from(corpus.stats.values()), function(word) { return -word.tfIdfSum;});
 
             sorted.forEach(function (word){
-                  console.log(word.word + ";" + word.nbrDocs + ";" +
-                                numeral(word.tfAvg).format("0.00")  + ";" +
-                                numeral(word.tfMin).format("0.00")  + ";" +
-                                numeral(word.tfMax).format("0.00")  + ";" +
-                                numeral(word.idfAvg).format("0.00")   + ';' +
-                                numeral(word.tfIdfSum).format("0.00")  + ';' +
-                                numeral(word.tfIdfAvg).format("0.00"));
+              if (word.nbrDocs > 1) {
+                console.log(word.word + ";" + word.nbrDocs + ";" +
+                              numeral(word.tfAvg).format("0.00")  + ";" +
+                              numeral(word.tfMin).format("0.00")  + ";" +
+                              numeral(word.tfMax).format("0.00")  + ";" +
+                              numeral(word.idfAvg).format("0.00")   + ';' +
+                              numeral(word.tfIdfSum).format("0.00")  + ';' +
+                              numeral(word.tfIdfAvg).format("0.00"));
+              }
             });
 
         }
