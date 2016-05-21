@@ -125,7 +125,7 @@ function createTask(q, options) {
  * @param callback(error, contents) - an arrays of content (Strings)
  */
 function loadContents(urls, language, removeSpecials, removeDiacritics, timeout, endCallback) {
-    logInfo("nnumber of URLs found : " + urls.length);
+    logInfo("number of URLs found : " + urls.length);
     var tasks = _.map(urls, function(url){ return function(callback){ loadContent(url, language, removeSpecials, removeDiacritics, timeout, callback);}; });
 
     async.parallel(tasks, function(error, results){
@@ -143,13 +143,11 @@ function loadContents(urls, language, removeSpecials, removeDiacritics, timeout,
  */
 function loadContent (url, language, removeSpecials, removeDiacritics, timeout, endCallback) {
 
-
     async.waterfall([
           async.apply(httpRequest, url, timeout),
           function(htmlContent, callback) {
 
               var content = removeHTMLTags(htmlContent);
-
               content = extractor(content, language).text;
 
               if (removeSpecials) {
