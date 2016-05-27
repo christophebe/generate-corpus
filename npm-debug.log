@@ -1,0 +1,117 @@
+0 info it worked if it ends with ok
+1 verbose cli [ '/Users/christophe/.nvm/versions/node/v6.2.0/bin/node',
+1 verbose cli   '/Users/christophe/.nvm/versions/node/v6.2.0/bin/npm',
+1 verbose cli   'publish' ]
+2 info using npm@3.8.9
+3 info using node@v6.2.0
+4 verbose publish [ '.' ]
+5 silly cache add args [ '.', null ]
+6 verbose cache add spec .
+7 silly cache add parsed spec Result {
+7 silly cache add   raw: '.',
+7 silly cache add   scope: null,
+7 silly cache add   name: null,
+7 silly cache add   rawSpec: '.',
+7 silly cache add   spec: '/Users/christophe/nodejs/_MODULES/crawler/utils/generate-corpus',
+7 silly cache add   type: 'directory' }
+8 verbose addLocalDirectory /Users/christophe/.npm/generate-corpus/1.0.8/package.tgz not in flight; packing
+9 verbose correctMkdir /Users/christophe/.npm correctMkdir not in flight; initializing
+10 info lifecycle generate-corpus@1.0.8~prepublish: generate-corpus@1.0.8
+11 silly lifecycle generate-corpus@1.0.8~prepublish: no script for prepublish, continuing
+12 verbose tar pack [ '/Users/christophe/.npm/generate-corpus/1.0.8/package.tgz',
+12 verbose tar pack   '/Users/christophe/nodejs/_MODULES/crawler/utils/generate-corpus' ]
+13 verbose tarball /Users/christophe/.npm/generate-corpus/1.0.8/package.tgz
+14 verbose folder /Users/christophe/nodejs/_MODULES/crawler/utils/generate-corpus
+15 verbose addLocalTarball adding from inside cache /Users/christophe/.npm/generate-corpus/1.0.8/package.tgz
+16 verbose correctMkdir /Users/christophe/.npm correctMkdir not in flight; initializing
+17 silly cache afterAdd generate-corpus@1.0.8
+18 verbose afterAdd /Users/christophe/.npm/generate-corpus/1.0.8/package/package.json not in flight; writing
+19 verbose correctMkdir /Users/christophe/.npm correctMkdir not in flight; initializing
+20 verbose afterAdd /Users/christophe/.npm/generate-corpus/1.0.8/package/package.json written
+21 silly publish { name: 'generate-corpus',
+21 silly publish   version: '1.0.8',
+21 silly publish   description: 'Generate a corpus based on a Google search or from a set of urls',
+21 silly publish   main: 'index.js',
+21 silly publish   repository:
+21 silly publish    { type: 'git',
+21 silly publish      url: 'git+https://github.com/christophebe/generate-corpus.git' },
+21 silly publish   scripts: { test: 'mocha', pretest: 'rm -rf ./logs' },
+21 silly publish   dependencies:
+21 silly publish    { async: '*',
+21 silly publish      cheerio: '*',
+21 silly publish      'detect-character-encoding': '*',
+21 silly publish      'iconv-lite': '*',
+21 silly publish      'natural-content': '*',
+21 silly publish      request: '*',
+21 silly publish      serp: '*',
+21 silly publish      underscore: '*',
+21 silly publish      unfluff: '*',
+21 silly publish      'crawler-ninja-logger': '*' },
+21 silly publish   devDependencies: { mocha: '*', expect: '*', numeraljs: '*', 'simple-proxies': '*' },
+21 silly publish   author: { name: 'Christophe Lombart' },
+21 silly publish   license: 'Apache',
+21 silly publish   readme: 'What is a corpus, Dude ?! This is just a set of words related to another one (in this case a keyword).\n\nThis module can build a corpus based on a google search or from a set of URLs. The first solution can be used to analyzed the words used by your top competitors.\n\n**Please wait ... still in progress. Your are welcome to contribute or suggest new ideas !**\n\n## Install\n\n```javascript\nnpm install generate-corpus --save\n```\n\n\n## Build a corpus from a google search\n\n```javascript\nvar corpus = require("generate-corpus");\nvar _      = require("underscore");\n\nvar options = {\n    host : "google.be",\n    num : 15,\n    qs: {\n        q: "rachat+crédit",\n        pws : 0,\n        //lr : "lang_fr",\n        //cr : "BE"\n    },\n    nbrGrams : 2,\n    withStopWords : false,\n    language : \'fr\'\n    //,proxy\n};\n\ncorpus.generateCorpus(options, function(error, corpus){\n\n    if (error) {\n      return console.log(error);\n    }\n\n    // Sort the list of words\n    var sorted = _.sortBy(Array.from(corpus.stats.values()), function(word) { return -word.tfIdfSum;});\n\n    console.log("Word;Nbr Docs;TF Avg;TF Min;TF Max;IDF Avg;TF.IDF Sum;TF.IDF Avg");\n    sorted.forEach(function (word){\n        console.log(word.word + ";" + word.nbrDocs + ";" +\n                    word.tfAvg + ";" + word.tfMin + ";" +\n                    word.tfMax + ";" + word.idfAvg + \';\' +\n                    word.tfIdfSum + \';\' + word.tfIdfAvg);\n    });\n\n\n});\n```\n\n## Build a corpus from a set of URLs\n\n```javascript\n\nvar search      = require("generate-corpus");\n\nvar options = {\n    urls : ["http://www.site.com", "http://www.site2.com", ...],\n    nbrGrams : 2, // expression len (one or more words)\n    withStopWords : false, // with or without stopwords\n    language : \'fr\'\n\n};\n\nsearch.generateCorpus(options, function(error, corpus){\n\n    if (error) {\n      console.log(error);\n    }\n\n    console.log(corpus);\n});\n```\n\n## Understanding the options\n\nIn both previous examples, the option json structure can contain the following parameters :\n\n**For the google search**\n- host : the google domain (google.com, google.fr, ... ). Default value : google.com.\n- num : the size of the SERP (number of pages to search).\n- qs : it used to customize the search on google :\n   q   : it the search keyword (replace spaces by +). It can be also an array of keywords.\n   qs can also contains other Google search params, see this document : https://moz.com/ugc/the-ultimate-guide-to-the-google-search-parameters.\n\n- User-Agent : not mandatory. Default value is : \'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:40.0) Gecko/20100101 Firefox/40.1\'\n\n\n**For generating the list of words/expressions**    \n- nbrGrams : the ngram compositions (could be a simple value of an array of ngrams, eg. : [1,2,3]).\n- withStopWords : if true, the lexical field will be made with the stop words.\n- language : the language iso code used to generate the corpus.\n- removeSpecials : remove numbers & special caracters before building the corpus.\n- removeDiacritics : remove diacritics before building the corpus.\n\n\n**Other options**\n- proxy : the proxy url used to make the google search & retrieve page content : http://user:password@host:port.\n\nProxy parameter can be replaced by proxyList if you are using a list of proxies (see below).\n\n## With proxies\n\n**If you want to use only one proxy for all http requests :**\nThe options can contain the proxy url\n\n```javascript\n\n\nvar options = {\n    host : "google.fr",\n    num : 15,\n    qs: {\n        q: "choisir son champagne",\n        pws : 0,\n        //lr : "lang_fr",\n        //cr : "BE"\n    },\n    nbrGrams : 3,\n    withStopWords : false,\n    language : \'fr\',\n    proxy : "http://user:password@host:port"\n};\n\n```\n\n**If you want to user severals proxies**\nIn this case, you can use the nodejs module ("simple proxies")[https://github.com/christophebe/simple-proxies]\nThis component load proxies from a text file or a DB.\n\n\n```javascript\nvar proxyLoader = require("simple-proxies/lib/proxyfileloader");\nvar search      = require("generate-corpus");\n\nvar config = proxyLoader.config().setProxyFile("./proxies.txt")\n                                 .setCheckProxies(true)\n                                 .setRemoveInvalidProxies(true);\n\nproxyLoader.loadProxyFile(config,function(error, proxyList){\n    if (error) {\n      // Manage error here\n    }\n    generateCorpus(proxyList)\n});\n\nfunction generateCorpus(proxyList) {\n\n  var options = {\n        host : "google.fr",\n        num : 15,\n        qs: {\n            q: "choisir son champagne",\n            pws : 0,\n            //lr : "lang_fr",\n            //cr : "BE"\n        },\n        nbrGrams : 3,\n        withStopWords : false,\n        language : \'fr\',\n        proxyList : proxyList\n  }\n\n  search.generateCorpus(options, function(error, corpus){\n\n      if (error) {\n        console.log(error);\n      }\n\n      console.log(corpus);\n  });\n\n\n}\n\n```\n\n## Data structure\n\n*If the options.nbrGrams is a simple value* , the generateCorpus function returns a map with a key matching to the word (or the ngram expression) and with a value based on the following structure :\n\n ```javascript\n  {  \n    // the word\n    word : "..."\n\n    // Number of docs containing the word\n    nbrDocs : 5,\n\n    // tf : Term Frequency\n    tfMin: 0.16666666666666666,\n    tfMax: 1,\n    tfAvg: 0.6470899470899472,\n\n    // Inverse Document Frequency\n    idfMax: 1.5108256237659907,\n    idfAvg: 1.5108256237659907,\n\n    // TF.IDF\n    tfIdfMin: 0.2518042706276651,\n    tfIdfMax: 1.5108256237659907,\n    tfIdfAvg: 0.9776400729448712,\n    tfIdfSum: 8.798760656503841,\n\n}\n```\n\n*If the options.nbrGrams is an array of ngrams*, the generateCorpus return an arrays of map matching to the previous structure.\nSee the unit test for a complete example.\n\n# TODO\n- Support multiples languages for stopwords, .... We are supporting for the moment only french.\n- Add cooccurrences for each terms.\n- Extract Named Entity.\n- generate a corpus based on "lemmatisation".\n- Server with API & multiples process.\n',
+21 silly publish   readmeFilename: 'README.md',
+21 silly publish   gitHead: 'bda952bce75a744cfcade41c5df621a7200a31fc',
+21 silly publish   bugs: { url: 'https://github.com/christophebe/generate-corpus/issues' },
+21 silly publish   homepage: 'https://github.com/christophebe/generate-corpus#readme',
+21 silly publish   _id: 'generate-corpus@1.0.8',
+21 silly publish   _shasum: '64af9ebf7df35b7aa8c3c93d7035bf0242023430',
+21 silly publish   _from: '.' }
+22 verbose getPublishConfig undefined
+23 silly mapToRegistry name generate-corpus
+24 silly mapToRegistry using default registry
+25 silly mapToRegistry registry https://registry.npmjs.org/
+26 silly mapToRegistry data Result {
+26 silly mapToRegistry   raw: 'generate-corpus',
+26 silly mapToRegistry   scope: null,
+26 silly mapToRegistry   name: 'generate-corpus',
+26 silly mapToRegistry   rawSpec: '',
+26 silly mapToRegistry   spec: 'latest',
+26 silly mapToRegistry   type: 'tag' }
+27 silly mapToRegistry uri https://registry.npmjs.org/generate-corpus
+28 verbose publish registryBase https://registry.npmjs.org/
+29 silly publish uploading /Users/christophe/.npm/generate-corpus/1.0.8/package.tgz
+30 verbose request uri https://registry.npmjs.org/generate-corpus
+31 verbose request sending authorization for write operation
+32 info attempt registry request try #1 at 10:16:05
+33 verbose request id 784e1863e6a363ce
+34 http request PUT https://registry.npmjs.org/generate-corpus
+35 http 403 https://registry.npmjs.org/generate-corpus
+36 verbose headers { 'content-type': 'application/json',
+36 verbose headers   'cache-control': 'max-age=300',
+36 verbose headers   'content-length': '95',
+36 verbose headers   'accept-ranges': 'bytes',
+36 verbose headers   date: 'Fri, 27 May 2016 08:16:08 GMT',
+36 verbose headers   via: '1.1 varnish',
+36 verbose headers   connection: 'keep-alive',
+36 verbose headers   'x-served-by': 'cache-ams4142-AMS',
+36 verbose headers   'x-cache': 'MISS',
+36 verbose headers   'x-cache-hits': '0',
+36 verbose headers   'x-timer': 'S1464336966.678255,VS0,VE1418',
+36 verbose headers   vary: 'Accept-Encoding' }
+37 verbose request invalidating /Users/christophe/.npm/registry.npmjs.org/generate-corpus on PUT
+38 error publish Failed PUT 403
+39 verbose stack Error: "You cannot publish over the previously published version 1.0.8." : generate-corpus
+39 verbose stack     at makeError (/Users/christophe/.nvm/versions/node/v6.2.0/lib/node_modules/npm/node_modules/npm-registry-client/lib/request.js:264:12)
+39 verbose stack     at CachingRegistryClient.<anonymous> (/Users/christophe/.nvm/versions/node/v6.2.0/lib/node_modules/npm/node_modules/npm-registry-client/lib/request.js:252:14)
+39 verbose stack     at Request._callback (/Users/christophe/.nvm/versions/node/v6.2.0/lib/node_modules/npm/node_modules/npm-registry-client/lib/request.js:172:14)
+39 verbose stack     at Request.self.callback (/Users/christophe/.nvm/versions/node/v6.2.0/lib/node_modules/npm/node_modules/request/request.js:200:22)
+39 verbose stack     at emitTwo (events.js:106:13)
+39 verbose stack     at Request.emit (events.js:191:7)
+39 verbose stack     at Request.<anonymous> (/Users/christophe/.nvm/versions/node/v6.2.0/lib/node_modules/npm/node_modules/request/request.js:1067:10)
+39 verbose stack     at emitOne (events.js:101:20)
+39 verbose stack     at Request.emit (events.js:188:7)
+39 verbose stack     at IncomingMessage.<anonymous> (/Users/christophe/.nvm/versions/node/v6.2.0/lib/node_modules/npm/node_modules/request/request.js:988:12)
+40 verbose statusCode 403
+41 verbose pkgid generate-corpus
+42 verbose cwd /Users/christophe/nodejs/_MODULES/crawler/utils/generate-corpus
+43 error Darwin 15.3.0
+44 error argv "/Users/christophe/.nvm/versions/node/v6.2.0/bin/node" "/Users/christophe/.nvm/versions/node/v6.2.0/bin/npm" "publish"
+45 error node v6.2.0
+46 error npm  v3.8.9
+47 error code E403
+48 error "You cannot publish over the previously published version 1.0.8." : generate-corpus
+49 error If you need help, you may report this error at:
+49 error     <https://github.com/npm/npm/issues>
+50 verbose exit [ 1, true ]
