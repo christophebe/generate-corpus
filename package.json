@@ -19,7 +19,6 @@
     "natural-content": "*",
     "request": "*",
     "serp": "*",
-    "simple-proxies": "*",
     "underscore": "*",
     "unfluff": "*",
     "crawler-ninja-logger": "*"
@@ -27,7 +26,8 @@
   "devDependencies": {
     "mocha": "*",
     "expect": "*",
-    "numeraljs": "*"
+    "numeraljs": "*",
+    "simple-proxies" : "*"
   },
   "author": "Christophe Lombart",
   "license": "Apache"

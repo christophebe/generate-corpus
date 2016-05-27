@@ -1,4 +1,4 @@
-What is a corpus, Dude ?! This is just a set of words related to another one (in this case).
+What is a corpus, Dude ?! This is just a set of words related to another one (in this case a keyword).
 
 This module can build a corpus based on a google search or from a set of URLs. The first solution can be used to analyzed the words used by your top competitors.
 
@@ -57,6 +57,8 @@ corpus.generateCorpus(options, function(error, corpus){
 
 ```javascript
 
+var search      = require("generate-corpus");
+
 var options = {
     urls : ["http://www.site.com", "http://www.site2.com", ...],
     nbrGrams : 2, // expression len (one or more words)
@@ -77,15 +79,106 @@ search.generateCorpus(options, function(error, corpus){
 
 ## Understanding the options
 
-In both previous examples, the options object contains differents parameters :
-1. host : the google domain (google.com, google.fr, ... ). Default value : google.com.
-2. num : the number of of pages when the corpus is build from a google search.
-3. qs : it used to customize the search on google :
-   q   : it the serch keyword (replace spaces by +).
-   For the other possibilities, see this document : https://moz.com/ugc/the-ultimate-guide-to-the-google-search-parameters.
-4. nbrGrams : the ngram compositions (could be a simple value of an array of ngrams, eg. : [1,2,3]).
-5. withStopWords : if true, the lexical field will be made with the stop words.
-6. language : the language iso code
+In both previous examples, the option json structure can contain the following parameters :
+
+**For the google search**
+- host : the google domain (google.com, google.fr, ... ). Default value : google.com.
+- num : the size of the SERP (number of pages to search).
+- qs : it used to customize the search on google :
+   q   : it the search keyword (replace spaces by +). It can be also an array of keywords.
+   qs can also contains other Google search params, see this document : https://moz.com/ugc/the-ultimate-guide-to-the-google-search-parameters.
+
+- User-Agent : not mandatory. Default value is : 'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:40.0) Gecko/20100101 Firefox/40.1'
+
+
+**For generating the list of words/expressions**    
+- nbrGrams : the ngram compositions (could be a simple value of an array of ngrams, eg. : [1,2,3]).
+- withStopWords : if true, the lexical field will be made with the stop words.
+- language : the language iso code used to generate the corpus.
+- removeSpecials : remove numbers & special caracters before building the corpus.
+- removeDiacritics : remove diacritics before building the corpus.
+
+
+**Other options**
+- proxy : the proxy url used to make the google search & retrieve page content : http://user:password@host:port.
+
+Proxy parameter can be replaced by proxyList if you are using a list of proxies (see below).
+
+## With proxies
+
+**If you want to use only one proxy for all http requests :**
+The options can contain the proxy url
+
+```javascript
+
+
+var options = {
+    host : "google.fr",
+    num : 15,
+    qs: {
+        q: "choisir son champagne",
+        pws : 0,
+        //lr : "lang_fr",
+        //cr : "BE"
+    },
+    nbrGrams : 3,
+    withStopWords : false,
+    language : 'fr',
+    proxy : "http://user:password@host:port"
+};
+
+```
+
+**If you want to user severals proxies**
+In this case, you can use the nodejs module ("simple proxies")[https://github.com/christophebe/simple-proxies]
+This component load proxies from a text file or a DB.
+
+
+```javascript
+var proxyLoader = require("simple-proxies/lib/proxyfileloader");
+var search      = require("generate-corpus");
+
+var config = proxyLoader.config().setProxyFile("./proxies.txt")
+                                 .setCheckProxies(true)
+                                 .setRemoveInvalidProxies(true);
+
+proxyLoader.loadProxyFile(config,function(error, proxyList){
+    if (error) {
+      // Manage error here
+    }
+    generateCorpus(proxyList)
+});
+
+function generateCorpus(proxyList) {
+
+  var options = {
+        host : "google.fr",
+        num : 15,
+        qs: {
+            q: "choisir son champagne",
+            pws : 0,
+            //lr : "lang_fr",
+            //cr : "BE"
+        },
+        nbrGrams : 3,
+        withStopWords : false,
+        language : 'fr',
+        proxyList : proxyList
+  }
+
+  search.generateCorpus(options, function(error, corpus){
+
+      if (error) {
+        console.log(error);
+      }
+
+      console.log(corpus);
+  });
+
+
+}
+
+```
 
 ## Data structure
 
@@ -123,5 +216,6 @@ See the unit test for a complete example.
 # TODO
 - Support multiples languages for stopwords, .... We are supporting for the moment only french.
 - Add cooccurrences for each terms.
-- generate a corpus based on "lemmatisation"
-- Server with API & multiples process
+- Extract Named Entity.
+- generate a corpus based on "lemmatisation".
+- Server with API & multiples process.

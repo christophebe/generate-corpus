@@ -1,7 +1,8 @@
-var search    = require("../index.js");
-var _         = require("underscore");
-var numeral   = require("numeraljs");
-var extractor = require("unfluff");
+var search      = require("../index.js");
+var _           = require("underscore");
+var numeral     = require("numeraljs");
+var extractor   = require("unfluff");
+var proxyLoader = require("simple-proxies/lib/proxyfileloader");
 
 numeral.language('fr', {
     delimiters: {
@@ -43,18 +44,32 @@ var options = {
 };
 
 
+describe.skip("Generate corpus", function() {
 
-describe("Generate corpus", function() {
+  var proxyList = null;
 
-  it.skip('test unfluff with bad HTML code', function(){
-      var content = "<html><body><p>Conditions d'utilisation<b class='hideforacc'>du Service de livraison internationale - la page s'ouvre dans une nouvelle fenêtre ou un nouvel onglet</b></p></body></html>";
-      content = content.replace(/(<b([^>]+)>)/ig, " ");
-      content = extractor(content, "fr").text;
-      console.log(">>", content);
+  before(function(done) {
+        this.timeout(100000);
+
+        var config = proxyLoader.config().setProxyFile("./proxies.txt")
+                                         .setCheckProxies(true)
+                                         .setRemoveInvalidProxies(false);
+
+        proxyLoader.loadProxyFile(config,function(error, pl){
+            if (error) {
+              done(error);
+            }
+            proxyList = pl;
+            console.log("proxies loaded");
+            done();
+        });
+
   });
+
 
   it('Generate Corpus', function(done) {
     this.timeout(1000000);
+    options.proxyList = proxyList;
     search.generateCorpus(options, function(error, corpus){
 
         if (error) {

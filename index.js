@@ -58,7 +58,7 @@ module.exports.generateCorpus = function(options, callback) {
             }
         },
         function(urls, callback) {
-            loadContents(urls, options.language, options.removeSpecials, options.removeDiacritics, options.timeout, callback);
+            loadContents(urls, options, callback);
         },
         function(contents, callback) {
             logInfo("Calculate the tf.idf ....", options);
@@ -124,9 +124,13 @@ function createTask(q, options) {
  * @param an array of url matching to the result SERP pages
  * @param callback(error, contents) - an arrays of content (Strings)
  */
-function loadContents(urls, language, removeSpecials, removeDiacritics, timeout, endCallback) {
+function loadContents(urls, options, endCallback) {
     logInfo("number of URLs found : " + urls.length);
-    var tasks = _.map(urls, function(url){ return function(callback){ loadContent(url, language, removeSpecials, removeDiacritics, timeout, callback);}; });
+    var tasks = _.map(urls,
+                  function(url){
+                      var o = _.clone(options);
+                      return function(callback){ loadContent(url, o, callback);};
+                  });
 
     async.parallel(tasks, function(error, results){
         endCallback(error, results);
@@ -141,19 +145,19 @@ function loadContents(urls, language, removeSpecials, removeDiacritics, timeout,
  * @param the target language
  * @param callback(error, content) - String, content converted in the correct encofing
  */
-function loadContent (url, language, removeSpecials, removeDiacritics, timeout, endCallback) {
+function loadContent (url, options, endCallback) {
 
     async.waterfall([
-          async.apply(httpRequest, url, timeout),
+          async.apply(httpRequest, url, options),
           function(htmlContent, callback) {
 
               var content = removeHTMLTags(htmlContent);
-              content = extractor(content, language).text;
+              content = extractor(content, options.language).text;
 
-              if (removeSpecials) {
+              if (options.removeSpecials) {
                   content = natural.removeSpecials(content);
               }
-              if (removeDiacritics) {
+              if (options.removeDiacritics) {
                 content = natural.removeDiacritics(content);
               }
 
@@ -165,11 +169,16 @@ function loadContent (url, language, removeSpecials, removeDiacritics, timeout, 
 
 }
 
-function httpRequest(url, timeout, callback) {
+function httpRequest(url, options, callback) {
 
     // encoding is null in order to get the response as buffer instead of String
     // By this way, we can detect the page encoding
-    var options = {
+
+    if (options.proxyList) {
+        options.proxy = options.proxyList.pick().getUrl();
+    }
+
+    var searchOptions = {
         uri : url,
         encoding : null,
         headers : {"User-Agent" : DEFAULT_USER_AGENT},
@@ -178,10 +187,11 @@ function httpRequest(url, timeout, callback) {
         secureOptions: require('constants').SSL_OP_NO_TLSv1_2,
         rejectUnauthorized : false,
 
-        timeout : timeout ?  timeout : DEFAULT_TIME_OUT,
+        timeout : options.timeout ?  options.timeout : DEFAULT_TIME_OUT,
+        proxy : options.proxy
     };
 
-    request(options ,function (error, response, body) {
+    request(searchOptions ,function (error, response, body) {
 
           if (error) {
             logError("Impossible to load the content" , options, error);
