@@ -21,12 +21,12 @@ var options = {
     host : "google.be",
     num : 15,
     qs: {
-        q: "rachat+crédit",
+        q: "barbecue",
         pws : 0,
         //lr : "lang_fr",
         //cr : "BE"
     },
-    nbrGrams : 2,
+    nbrGrams : 1,
     withStopWords : false,
     language : 'fr'
     //,proxy
@@ -212,6 +212,62 @@ function generateCorpus(proxyList) {
 
 *If the options.nbrGrams is an array of ngrams*, the generateCorpus return an arrays of map matching to the previous structure.
 See the unit test for a complete example.
+
+
+## Another example with multiple ngrams
+
+For this example, you have to install the following dependencies in your project :
+
+```javascript
+npm install generate-corpus numeraljs underscore -S
+```
+
+ ```javascript
+var corpus  = require("generate-corpus");
+var _       = require("underscore");
+var numeral = require("numeraljs");
+
+var options = {
+    host : "google.fr",
+    num : 20,
+    qs: {
+        q: "comment choisir un champagne",
+        pws : 0,
+        //lr : "lang_fr",
+        //cr : "BE"
+    },
+    nbrGrams : [1,2,3],
+    withStopWords : false,
+    language : 'fr',
+    removeSpecials : true,
+    removeDiacritics : true
+
+};
+
+corpus.generateCorpus(options, function(error, corpus){
+
+    if (error) {
+      return console.log(error);
+    }
+
+    var allWords = Array.from(corpus[0].stats.values()).concat(Array.from(corpus[1].stats.values()).concat(Array.from(corpus[2].stats.values())));
+    var sorted = _.sortBy(allWords, function(word) { return -word.tfIdfSum;}).slice(0,100);
+
+    sorted.forEach(function (word){
+
+            console.log(word.word + ";" + word.nbrDocs + ";" +
+                          numeral(word.tfAvg).format("0.00")  + ";" +
+                          numeral(word.tfMin).format("0.00")  + ";" +
+                          numeral(word.tfMax).format("0.00")  + ";" +
+                          numeral(word.idfAvg).format("0.00")   + ';' +
+                          numeral(word.tfIdfSum).format("0.00")  + ';' +
+                          numeral(word.tfIdfAvg).format("0.00"));
+    });
+
+});
+ ```
+
+
 
 # TODO
 - Support multiples languages for stopwords, .... We are supporting for the moment only french.
