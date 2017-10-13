@@ -54,6 +54,8 @@ async function generateCorpus(options) {
  * @return {Arrays} The list of document URL
  */
 async function getUrls(options) {
+  let urls = null;
+
   logInfo("get urls", options);
   if (options.url) {
     return options.url;
@@ -70,9 +72,11 @@ async function getUrls(options) {
     const promises = o.qs.q.map(kw => searchPromise(o, kw));
     const results = await Promise.all(promises);
     // Flatten the result array
-    return [].concat(...results);
+    urls = [].concat(...results);
   }
-  return serp.search(o);
+  urls = await serp.search(o);
+
+  return unique(urls);
 }
 
 
@@ -168,5 +172,25 @@ function logInfo(message, options) {
 function logError(message, options, error) {
   log.error({ module: "generate-corpus", message, options, error });
 }
+
+
+/**
+ * unique - Return unique url for an array matching to a Serp result
+ *
+ * @param  {type} serpUrls description
+ * @return {type}       description
+ */
+function unique(serpUrls) {
+  // console.log(serpUrls);
+  const urls = [];
+  return serpUrls.reduce((uniqueArray, urlInfo) => {
+    if (urls.indexOf(urlInfo.url) === -1) {
+      urls.push(urlInfo.url);
+      uniqueArray.push(urlInfo);
+    }
+    return uniqueArray;
+  }, []);
+}
+
 
 module.exports.generateCorpus = generateCorpus;

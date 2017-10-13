@@ -49,7 +49,7 @@ describe("Generate corpus", () => {
     console.log(">>", content);
   });
 
-  it.only("test building a corpus from a Google SERP", function test() {
+  it("test building a corpus from a Google SERP", function test() {
     this.timeout(1000000);
     search.generateCorpus(options)
       .then(result => console.log("result", result))
