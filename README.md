@@ -1,6 +1,4 @@
-What is a corpus, Dude ?! This is just a set of words related to another one (in this case a keyword).
-
-This module can build a corpus based on a google search or from a set of URLs. The first solution can be used to analyzed the words used by your top competitors.
+This module can build a corpus based on a google search or from a set of URLs.
 
 **Please wait ... still in progress. Your are welcome to contribute or suggest new ideas !**
 
@@ -103,6 +101,10 @@ In both previous examples, the option json structure can contain the following p
 - proxy : the proxy url used to make the google search & retrieve page content : http://user:password@host:port.
 
 Proxy parameter can be replaced by proxyList if you are using a list of proxies (see below).
+
+## Encoding
+
+Automatic detection of the encoding doesn't work on Windows. On this OS, you should set the encoding in the options. 
 
 ## With proxies
 

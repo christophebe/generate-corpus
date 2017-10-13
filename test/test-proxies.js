@@ -1,82 +1,80 @@
-var search      = require("../index.js");
-var _           = require("underscore");
-var numeral     = require("numeraljs");
-var extractor   = require("unfluff");
-var proxyLoader = require("simple-proxies/lib/proxyfileloader");
+const search = require("../index.js");
+const _ = require("underscore");
+const numeral = require("numeraljs");
+const extractor = require("unfluff");
+const proxyLoader = require("simple-proxies/lib/proxyfileloader");
 
-numeral.language('fr', {
-    delimiters: {
-        thousands: ' ',
-        decimal: ','
-    },
-    abbreviations: {
-        thousand: 'k',
-        million: 'm',
-        billion: 'b',
-        trillion: 't'
-    },
-    ordinal : function (number) {
-        return number === 1 ? 'er' : 'ème';
-    },
-    currency: {
-        symbol: '€'
-    }
+numeral.language("fr", {
+  delimiters: {
+    thousands: " ",
+    decimal: ",",
+  },
+  abbreviations: {
+    thousand: "k",
+    million: "m",
+    billion: "b",
+    trillion: "t",
+  },
+  ordinal(number) {
+    return number === 1 ? "er" : "ème";
+  },
+  currency: {
+    symbol: "€",
+  },
 });
 
-numeral.language('fr');
+numeral.language("fr");
 
 
-var options = {
-    host : "google.fr",
-    num : 20,
-    qs: {
-        q: "comment choisir un champagne",
-        pws : 0,
-        //lr : "lang_fr" //,
-        //cr : "BE"
-    },
-    nbrGrams : [1,2,3],
-    withStopWords : false,
-    language : 'fr',
-    removeSpecials : true,
-    removeDiacritics : true
-    //,proxy
+const options = {
+  host: "google.fr",
+  num: 100,
+  qs: {
+    q: "simulateur credit",
+    pws: 0,
+    // lr : "lang_fr" //,
+    // cr : "BE"
+  },
+  nbrGrams: [1, 2, 3, 4],
+  withStopWords: true,
+  language: "fr",
+  removeSpecials: true,
+  removeDiacritics: true,
+  // ,proxy
 };
 
 
-describe.skip("Generate corpus", function() {
+describe("Generate corpus", () => {
+  let proxyList = null;
 
-  var proxyList = null;
+  before(function (done) {
+    this.timeout(100000);
 
-  before(function(done) {
-        this.timeout(100000);
+    const config = proxyLoader.config().setProxyFile("./proxies.txt")
+      .setCheckProxies(true)
+      .setRemoveInvalidProxies(false);
 
-        var config = proxyLoader.config().setProxyFile("./proxies.txt")
-                                         .setCheckProxies(true)
-                                         .setRemoveInvalidProxies(false);
-
-        proxyLoader.loadProxyFile(config,function(error, pl){
-            if (error) {
-              done(error);
-            }
-            proxyList = pl;
-            console.log("proxies loaded");
-            done();
-        });
-
+    proxyLoader.loadProxyFile(config, (error, pl) => {
+      if (error) {
+        done(error);
+      }
+      proxyList = pl;
+      console.log("proxies loaded");
+      done();
+    });
   });
 
 
-  it('Generate Corpus', function(done) {
+  it("Generate Corpus", function (done) {
     this.timeout(1000000);
     options.proxyList = proxyList;
-    search.generateCorpus(options, function(error, corpus){
-
-        if (error) {
-          console.log(error);
-          done();
-        }
-
+    search.generateCorpus(options, (error, corpus) => {
+      if (error) {
+        console.log(error);
+        done();
+      }
+      console.log(corpus);
+      /*
         console.log("Word;Nbr Docs;TF Avg;TF Min;TF Max;IDF Avg;TF.IDF Sum;TF.IDF Avg");
         var sorted = null;
         // if ngrGrams is an array
@@ -116,13 +114,10 @@ describe.skip("Generate corpus", function() {
             });
 
         }
+        */
 
 
-
-        done();
-
+      done();
+    });
   });
-});
-
-
 });
