@@ -1,4 +1,5 @@
 This module can build a corpus based on a google search or from a set of URLs.
+It also gives the possibility to make basic semantic analysis on the corpus.
 
 **Please wait ... still in progress. Your are welcome to contribute or suggest new ideas !**
 
@@ -12,67 +13,44 @@ npm install generate-corpus --save
 ## Build a corpus from a google search
 
 ```javascript
-var corpus = require("generate-corpus");
-var _      = require("underscore");
+const corpus = require("generate-corpus");
 
-var options = {
+
+const options = {
     host : "google.be",
-    num : 15,
+    num : 100,
     qs: {
         q: "barbecue",
         pws : 0,
-        //lr : "lang_fr",
-        //cr : "BE"
-    },
-    nbrGrams : 1,
-    withStopWords : false,
-    language : 'fr'
-    //,proxy
+    }
 };
 
-corpus.generateCorpus(options, function(error, corpus){
+try {
+  const docs = await corpus.generateCorpus(options);
+  console.log(doc); //contains an array of object composes of a url, a title, a content
+} catch(error) {
+  console.log(error);
+}
 
-    if (error) {
-      return console.log(error);
-    }
-
-    // Sort the list of words
-    var sorted = _.sortBy(Array.from(corpus.stats.values()), function(word) { return -word.tfIdfSum;});
-
-    console.log("Word;Nbr Docs;TF Avg;TF Min;TF Max;IDF Avg;TF.IDF Sum;TF.IDF Avg");
-    sorted.forEach(function (word){
-        console.log(word.word + ";" + word.nbrDocs + ";" +
-                    word.tfAvg + ";" + word.tfMin + ";" +
-                    word.tfMax + ";" + word.idfAvg + ';' +
-                    word.tfIdfSum + ';' + word.tfIdfAvg);
-    });
-
-
-});
 ```
 
 ## Build a corpus from a set of URLs
 
 ```javascript
 
-var search      = require("generate-corpus");
+const search = require("generate-corpus");
 
-var options = {
-    urls : ["http://www.site.com", "http://www.site2.com", ...],
-    nbrGrams : 2, // expression len (one or more words)
-    withStopWords : false, // with or without stopwords
-    language : 'fr'
-
+const options = {
+    urls : ["http://www.site.com", "http://www.site2.com", ...]
 };
 
-search.generateCorpus(options, function(error, corpus){
+try {
+  const docs = await corpus.generateCorpus(options);
+  console.log(doc); //contains an array of object composed of a url, a title, a content
+} catch(error) {
+  console.log(error);
+}
 
-    if (error) {
-      console.log(error);
-    }
-
-    console.log(corpus);
-});
 ```
 
 ## Understanding the options
@@ -89,22 +67,10 @@ In both previous examples, the option json structure can contain the following p
 - User-Agent : not mandatory. Default value is : 'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:40.0) Gecko/20100101 Firefox/40.1'
 
 
-**For generating the list of words/expressions**    
-- nbrGrams : the ngram compositions (could be a simple value of an array of ngrams, eg. : [1,2,3]).
-- withStopWords : if true, the lexical field will be made with the stop words.
-- language : the language iso code used to generate the corpus.
-- removeSpecials : remove numbers & special caracters before building the corpus.
-- removeDiacritics : remove diacritics before building the corpus.
-
-
 **Other options**
 - proxy : the proxy url used to make the google search & retrieve page content : http://user:password@host:port.
 
 Proxy parameter can be replaced by proxyList if you are using a list of proxies (see below).
-
-## Encoding
-
-Automatic detection of the encoding doesn't work on Windows. On this OS, you should set the encoding in the options. 
 
 ## With proxies
 
@@ -113,18 +79,13 @@ The options can contain the proxy url
 
 ```javascript
 
-
-var options = {
+const options = {
     host : "google.fr",
     num : 15,
     qs: {
         q: "choisir son champagne",
-        pws : 0,
-        //lr : "lang_fr",
-        //cr : "BE"
+        pws : 0
     },
-    nbrGrams : 3,
-    withStopWords : false,
     language : 'fr',
     proxy : "http://user:password@host:port"
 };
@@ -136,144 +97,9 @@ In this case, you can use the nodejs module ("simple proxies")[https://github.co
 This component load proxies from a text file or a DB.
 
 
-```javascript
-var proxyLoader = require("simple-proxies/lib/proxyfileloader");
-var search      = require("generate-corpus");
-
-var config = proxyLoader.config().setProxyFile("./proxies.txt")
-                                 .setCheckProxies(true)
-                                 .setRemoveInvalidProxies(true);
-
-proxyLoader.loadProxyFile(config,function(error, proxyList){
-    if (error) {
-      // Manage error here
-    }
-    generateCorpus(proxyList)
-});
-
-function generateCorpus(proxyList) {
-
-  var options = {
-        host : "google.fr",
-        num : 15,
-        qs: {
-            q: "choisir son champagne",
-            pws : 0,
-            //lr : "lang_fr",
-            //cr : "BE"
-        },
-        nbrGrams : 3,
-        withStopWords : false,
-        language : 'fr',
-        proxyList : proxyList
-  }
-
-  search.generateCorpus(options, function(error, corpus){
-
-      if (error) {
-        console.log(error);
-      }
-
-      console.log(corpus);
-  });
-
-
-}
-
-```
-
-## Data structure
-
-*If the options.nbrGrams is a simple value* , the generateCorpus function returns a map with a key matching to the word (or the ngram expression) and with a value based on the following structure :
-
- ```javascript
-  {  
-    // the word
-    word : "..."
-
-    // Number of docs containing the word
-    nbrDocs : 5,
-
-    // tf : Term Frequency
-    tfMin: 0.16666666666666666,
-    tfMax: 1,
-    tfAvg: 0.6470899470899472,
-
-    // Inverse Document Frequency
-    idfMax: 1.5108256237659907,
-    idfAvg: 1.5108256237659907,
-
-    // TF.IDF
-    tfIdfMin: 0.2518042706276651,
-    tfIdfMax: 1.5108256237659907,
-    tfIdfAvg: 0.9776400729448712,
-    tfIdfSum: 8.798760656503841,
-
-}
-```
-
-*If the options.nbrGrams is an array of ngrams*, the generateCorpus return an arrays of map matching to the previous structure.
-See the unit test for a complete example.
-
-
-## Another example with multiple ngrams
-
-For this example, you have to install the following dependencies in your project :
-
-```javascript
-npm install generate-corpus numeraljs underscore -S
-```
-
- ```javascript
-var corpus  = require("generate-corpus");
-var _       = require("underscore");
-var numeral = require("numeraljs");
-
-var options = {
-    host : "google.fr",
-    num : 20,
-    qs: {
-        q: "comment choisir un champagne",
-        pws : 0,
-        //lr : "lang_fr",
-        //cr : "BE"
-    },
-    nbrGrams : [1,2,3],
-    withStopWords : false,
-    language : 'fr',
-    removeSpecials : true,
-    removeDiacritics : true
-
-};
-
-corpus.generateCorpus(options, function(error, corpus){
-
-    if (error) {
-      return console.log(error);
-    }
-
-    var allWords = Array.from(corpus[0].stats.values()).concat(Array.from(corpus[1].stats.values()).concat(Array.from(corpus[2].stats.values())));
-    var sorted = _.sortBy(allWords, function(word) { return -word.tfIdfSum;}).slice(0,100);
-
-    sorted.forEach(function (word){
-
-            console.log(word.word + ";" + word.nbrDocs + ";" +
-                          numeral(word.tfAvg).format("0.00")  + ";" +
-                          numeral(word.tfMin).format("0.00")  + ";" +
-                          numeral(word.tfMax).format("0.00")  + ";" +
-                          numeral(word.idfAvg).format("0.00")   + ';' +
-                          numeral(word.tfIdfSum).format("0.00")  + ';' +
-                          numeral(word.tfIdfAvg).format("0.00"));
-    });
-
-});
- ```
-
-
 
 # TODO
 - Support multiples languages for stopwords, .... We are supporting for the moment only french.
 - Add cooccurrences for each terms.
 - Extract Named Entity.
 - generate a corpus based on "lemmatisation".
-- Server with API & multiples process.

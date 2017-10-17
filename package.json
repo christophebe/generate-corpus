@@ -16,20 +16,21 @@
     "deepcopy": "^0.6.3",
     "natural-content": "*",
     "request-promise-native": "*",
-    "serp": "*",
-    "unfluff": "*"
+    "serp": "^2.0.2",
+    "unfluff": "*",
+    "word2vec": "^1.1.2"
   },
   "devDependencies": {
     "babel-eslint": "^8.0.0",
-    "eslint": "^4.7.1",
+    "eslint": "^4.9.0",
     "eslint-config-airbnb": "^15.1.0",
     "eslint-plugin-import": "^2.7.0",
     "eslint-plugin-jsx-a11y": "^5.1.1",
     "eslint-plugin-react": "^7.3.0",
     "mocha": "*",
-    "expect": "*",
+    "numeraljs": "*",
     "simple-proxies": "*",
-    "numeraljs": "*"
+    "chai": "^3.5.0"
   },
   "author": "Christophe Lombart",
   "license": "Apache"

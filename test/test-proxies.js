@@ -1,3 +1,4 @@
+const should = require("chai").should();
 const search = require("../index.js");
 const numeral = require("numeraljs");
 const proxyLoader = require("simple-proxies/lib/proxyfileloader");
@@ -33,15 +34,11 @@ const options = {
     // lr : "lang_fr" //,
     // cr : "BE"
   },
-  nbrGrams: [1, 2, 3],
-  withStopWords: false,
   language: "fr",
-  removeSpecials: false,
-  removeDiacritics: false,
-  // ,proxy
+
 };
 
-describe("Generate corpus", () => {
+describe.skip("Generate corpus with proxies", () => {
   let proxyList = null;
   before(function before(done) {
     this.timeout(100000);
@@ -61,11 +58,11 @@ describe("Generate corpus", () => {
   });
 
 
-  it.only("test building a corpus from a Google SERP", function test() {
+  it("test building a corpus from a Google SERP", function test() {
     this.timeout(1000000);
     options.proxyList = proxyList;
     search.generateCorpus(options)
-      .then(result => console.log("result", result.length))
-      .catch(error => console.log(error));
+      .then(corpus => corpus.should.to.have.lengthOf(10))
+      .catch(error => error.should.not.be.null);
   });
 });
