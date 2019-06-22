@@ -95,11 +95,3 @@ const options = {
 **If you want to user severals proxies**
 In this case, you can use the nodejs module ("simple proxies")[https://github.com/christophebe/simple-proxies]
 This component load proxies from a text file or a DB.
-
-
-
-# TODO
-- Support multiples languages for stopwords, .... We are supporting for the moment only french.
-- Add cooccurrences for each terms.
-- Extract Named Entity.
-- generate a corpus based on "lemmatisation".

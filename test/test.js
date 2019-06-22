@@ -1,92 +1,79 @@
-const should = require("chai").should();
-const search = require("../index.js");
-const numeral = require("numeraljs");
-const extractor = require("unfluff");
+const { expect } = require('chai');
+const search = require('../index.js');
 
-numeral.language("fr", {
-  delimiters: {
-    thousands: " ",
-    decimal: ",",
-  },
-  abbreviations: {
-    thousand: "k",
-    million: "m",
-    billion: "b",
-    trillion: "t",
-  },
-  ordinal(number) {
-    return number === 1 ? "er" : "ème";
-  },
-  currency: {
-    symbol: "€",
-  },
-});
-
-numeral.language("fr");
-
+const DOCS_10 = 10;
+const DOCS_100 = 100;
 
 const simpleSearch = {
-  host: "google.fr",
-  num: 10,
+  host: 'google.fr',
+  num: DOCS_10,
   qs: {
-    q: ["développement du chien"],
-    pws: 0,
+    q: [ 'développement du chien' ],
+    pws: 0
+
     // lr : "lang_fr" //,
     // cr : "BE"
   },
-  language: "fr",
+  language: 'fr'
+
+};
+
+const search100 = {
+  host: 'google.fr',
+  num: DOCS_100,
+  qs: {
+    q: [ 'développement du chien' ],
+    pws: 0,
+    num: DOCS_100
+  },
+  language: 'fr'
 
 };
 
 const doubleSearch = {
-  host: "google.fr",
+  host: 'google.fr',
   num: 10,
   qs: {
-    q: ["développement du chien", "développement du chien"],
-    pws: 0,
-    // lr : "lang_fr" //,
-    // cr : "BE"
+    q: [ 'développement du chien', 'développement du chien' ],
+    pws: 0
   },
-  language: "fr",
+  language: 'fr'
 };
 
-const fullOptions = {
-  host: "google.fr",
-  num: 10,
-  qs: {
-    q: ["développement du chien"],
-    pws: 0,
-    // lr : "lang_fr" //,
-    // cr : "BE"
-  },
-  nbrGrams: [1, 2, 3],
-  withStopWords: false,
-  language: "fr",
-  removeSpecials: false,
-  removeDiacritics: false,
-  // ,proxy
-};
+describe('Generate corpus', async () => {
+  it('test building a corpus of 10 documents from a Google SERP', async () => {
+    try {
+      const corpus = await search.generateCorpus(simpleSearch);
 
-
-describe("Generate corpus", () => {
-  it("test unfluff with bad HTML code", () => {
-    let content = "<html><body><p>Conditions d'utilisation<b class='hideforacc'>du Service de livraison internationale - la page s'ouvre dans une nouvelle fenêtre ou un nouvel onglet</b></p></body></html>";
-    content = content.replace(/(<b([^>]+)>)/ig, " ");
-    content = extractor(content, "fr").text;
-    console.log(">>", content);
+      console.log('corpus', corpus);
+      expect(corpus).to.have.lengthOf(DOCS_10);
+    } catch (e) {
+      console.log(e);
+      expect(e).be.null;
+    }
   });
 
-  it("test building a corpus of 10 documents from a Google SERP", function test() {
-    this.timeout(1000000);
-    search.generateCorpus(simpleSearch)
-      .then(corpus => corpus.should.to.have.lengthOf(10))
-      .catch(error => error.should.not.be.null);
+  it('test building a corpus of 20 documents with duplicate docs from a Google SERP', async () => {
+    try {
+      const corpus = await search.generateCorpus(doubleSearch);
+
+      console.log('corpus', corpus);
+      expect(corpus).to.have.lengthOf(DOCS_10);
+    } catch (e) {
+      console.log(e);
+      expect(e).be.null;
+    }
   });
 
-  it("test building a corpus of 20 documents with duplicate docs from a Google SERP", function test() {
-    this.timeout(1000000);
-    search.generateCorpus(doubleSearch)
-      .then(corpus => corpus.should.to.have.lengthOf(10))
-      .catch(error => error.should.not.be.null);
+  it('test building a corpus of 100 documents', async () => {
+    try {
+      const corpus = await search.generateCorpus(search100);
+
+      console.log('corpus', corpus);
+      expect(corpus).to.have.lengthOf(DOCS_100);
+    } catch (e) {
+      console.log(e);
+      expect(e).be.null;
+    }
   });
 });
