@@ -46,7 +46,7 @@ describe('Generate corpus', async () => {
       const corpus = await search.generateCorpus(simpleSearch);
 
       console.log('corpus', corpus);
-      expect(corpus).to.have.lengthOf(DOCS_10);
+      expect(corpus.documents).to.have.lengthOf(DOCS_10);
     } catch (e) {
       console.log(e);
       expect(e).be.null;
@@ -57,8 +57,8 @@ describe('Generate corpus', async () => {
     try {
       const corpus = await search.generateCorpus(doubleSearch);
 
-      console.log('corpus', corpus);
-      expect(corpus).to.have.lengthOf(DOCS_10);
+      // console.log('corpus', corpus);
+      expect(corpus.documents).to.have.lengthOf(DOCS_10);
     } catch (e) {
       console.log(e);
       expect(e).be.null;
@@ -70,7 +70,7 @@ describe('Generate corpus', async () => {
       const corpus = await search.generateCorpus(search100);
 
       console.log('corpus', corpus);
-      expect(corpus).to.have.lengthOf(DOCS_100);
+      expect(corpus.documents).to.have.lengthOf(DOCS_100);
     } catch (e) {
       console.log(e);
       expect(e).be.null;

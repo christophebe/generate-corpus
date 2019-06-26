@@ -1,6 +1,6 @@
 {
   "name": "generate-corpus",
-  "version": "2.0.1",
+  "version": "2.0.2",
   "description": "Generate a corpus based on a Google search or from a set of urls",
   "main": "index.js",
   "repository": {
@@ -8,7 +8,7 @@
     "url": "https://github.com/christophebe/generate-corpus"
   },
   "scripts": {
-    "test": "mocha 'test/**/*.js' --timeout 30000",
+    "test": "mocha 'test/**/*.js' --timeout 60000",
     "pretest": "rm -rf ./logs"
   },
   "dependencies": {
@@ -17,8 +17,8 @@
     "crawler-ninja-logger": "*",
     "deepcopy": "^0.6.3",
     "detect-character-encoding": "^0.7.0",
-    "find-main-content": "^1.1.0",
-    "natural-content": "^1.0.10",
+    "find-main-content": "^1.1.2",
+    "natural-content": "^1.0.15",
     "request-promise-native": "^1.0.7",
     "serp": "^2.0.5"
   },
@@ -26,8 +26,8 @@
     "chai": "^3.5.0",
     "eslint": "^5.16.0",
     "eslint-config-adidas-es8": "^1.1.0",
-    "eslint-plugin-import": "^2.17.3",
-    "eslint-plugin-promise": "^4.1.1",
+    "eslint-plugin-import": "^2.18.0",
+    "eslint-plugin-promise": "^4.2.1",
     "mocha": "^6.1.4"
   },
   "author": "Christophe Lombart",
