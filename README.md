@@ -26,8 +26,8 @@ const options = {
 };
 
 try {
-  const docs = await corpus.generateCorpus(options);
-  console.log(doc); //contains an array of object composes of a url, a title, a content
+  const corpus = await corpus.generateCorpus(options);
+  console.log(corpus); // Excellent data structure about the corpus !
 } catch(error) {
   console.log(error);
 }
@@ -45,8 +45,8 @@ const options = {
 };
 
 try {
-  const docs = await corpus.generateCorpus(options);
-  console.log(doc); //contains an array of object composed of a url, a title, a content
+  const corpus = await corpus.generateCorpus(options);
+  console.log(corpus); 
 } catch(error) {
   console.log(error);
 }

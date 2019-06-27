@@ -8,7 +8,7 @@ const simpleSearch = {
   host: 'google.fr',
   num: DOCS_10,
   qs: {
-    q: [ 'développement du chien' ],
+    q: [ 'comment éduquer son chien' ],
     pws: 0
 
     // lr : "lang_fr" //,
@@ -22,7 +22,7 @@ const search100 = {
   host: 'google.fr',
   num: DOCS_100,
   qs: {
-    q: [ 'développement du chien' ],
+    q: [ 'comment éduquer son chien' ],
     pws: 0,
     num: DOCS_100
   },
@@ -65,7 +65,7 @@ describe('Generate corpus', async () => {
     }
   });
 
-  it('test building a corpus of 100 documents', async () => {
+  it.skip('test building a corpus of 100 documents', async () => {
     try {
       const corpus = await search.generateCorpus(search100);
 

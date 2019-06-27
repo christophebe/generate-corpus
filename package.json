@@ -1,6 +1,6 @@
 {
   "name": "generate-corpus",
-  "version": "2.0.2",
+  "version": "2.0.3",
   "description": "Generate a corpus based on a Google search or from a set of urls",
   "main": "index.js",
   "repository": {
@@ -17,7 +17,7 @@
     "crawler-ninja-logger": "*",
     "deepcopy": "^0.6.3",
     "detect-character-encoding": "^0.7.0",
-    "find-main-content": "^1.1.2",
+    "find-main-content": "^1.1.4",
     "natural-content": "^1.0.15",
     "request-promise-native": "^1.0.7",
     "serp": "^2.0.5"
