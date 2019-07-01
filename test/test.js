@@ -5,16 +5,17 @@ const DOCS_10 = 10;
 const DOCS_100 = 100;
 
 const simpleSearch = {
-  host: 'google.fr',
+  host: 'google.com',
   num: DOCS_10,
   qs: {
-    q: [ 'comment éduquer son chien' ],
-    pws: 0
+    q: [ 'how big do jack russell terriers get' ],
+    pws: 0,
 
-    // lr : "lang_fr" //,
-    // cr : "BE"
+    lr: 'lang_en',
+    cr: 'USA'
   },
-  language: 'fr'
+  language: 'en',
+  contentFormat: 'md'
 
 };
 
