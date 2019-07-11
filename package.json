@@ -1,6 +1,6 @@
 {
   "name": "generate-corpus",
-  "version": "2.1.0",
+  "version": "2.1.1",
   "description": "Generate a corpus based on a Google search or from a set of urls",
   "main": "index.js",
   "repository": {
@@ -15,16 +15,16 @@
     "async-parallel": "^1.2.3",
     "cheerio": "^1.0.0-rc.3",
     "crawler-ninja-logger": "*",
-    "deepcopy": "^0.6.3",
-    "detect-character-encoding": "^0.7.0",
-    "find-main-content": "^1.1.4",
-    "natural-content": "^1.0.15",
+    "deepcopy": "^2.0.0",
+    "detect-character-encoding": "^0.8.0",
+    "find-main-content": "^1.1.6",
+    "natural-content": "^1.1.1",
     "request-promise-native": "^1.0.7",
-    "serp": "^2.0.5"
+    "serp": "^2.0.6"
   },
   "devDependencies": {
-    "chai": "^3.5.0",
-    "eslint": "^5.16.0",
+    "chai": "^4.2.0",
+    "eslint": "^6.0.1",
     "eslint-config-adidas-es8": "^1.1.0",
     "eslint-plugin-import": "^2.18.0",
     "eslint-plugin-promise": "^4.2.1",

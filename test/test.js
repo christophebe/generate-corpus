@@ -1,20 +1,17 @@
 const { expect } = require('chai');
-const search = require('../index.js');
+const { saveCorpus, generateCorpus } = require('../index.js');
 
 const DOCS_10 = 10;
 const DOCS_100 = 100;
 
 const simpleSearch = {
-  host: 'google.com',
+  host: 'google.fr',
   num: DOCS_10,
   qs: {
-    q: [ 'how big do jack russell terriers get' ],
-    pws: 0,
-
-    lr: 'lang_en',
-    cr: 'USA'
+    q: [ 'éduquer son chien ' ],
+    pws: 0
   },
-  language: 'en',
+  language: 'fr',
   contentFormat: 'md'
 
 };
@@ -42,9 +39,21 @@ const doubleSearch = {
 };
 
 describe('Generate corpus', async () => {
+  it.skip('test saving a corpus of 10 documents from a Google SERP', async () => {
+    try {
+      await saveCorpus(simpleSearch, './test', false);
+
+      // console.log('corpus', corpus);
+      // expect(corpus.documents).to.have.lengthOf(DOCS_10);
+    } catch (e) {
+      console.log(e);
+      expect(e).be.null;
+    }
+  });
+
   it('test building a corpus of 10 documents from a Google SERP', async () => {
     try {
-      const corpus = await search.generateCorpus(simpleSearch);
+      const corpus = await generateCorpus(simpleSearch);
 
       console.log('corpus', corpus);
       expect(corpus.documents).to.have.lengthOf(DOCS_10);
@@ -56,7 +65,7 @@ describe('Generate corpus', async () => {
 
   it('test building a corpus of 20 documents with duplicate docs from a Google SERP', async () => {
     try {
-      const corpus = await search.generateCorpus(doubleSearch);
+      const corpus = await generateCorpus(doubleSearch);
 
       // console.log('corpus', corpus);
       expect(corpus.documents).to.have.lengthOf(DOCS_10);
@@ -68,7 +77,7 @@ describe('Generate corpus', async () => {
 
   it.skip('test building a corpus of 100 documents', async () => {
     try {
-      const corpus = await search.generateCorpus(search100);
+      const corpus = await generateCorpus(search100);
 
       console.log('corpus', corpus);
       expect(corpus.documents).to.have.lengthOf(DOCS_100);
