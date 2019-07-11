@@ -1,6 +1,6 @@
 {
   "name": "generate-corpus",
-  "version": "2.1.1",
+  "version": "2.1.2",
   "description": "Generate a corpus based on a Google search or from a set of urls",
   "main": "index.js",
   "repository": {
