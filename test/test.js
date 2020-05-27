@@ -39,7 +39,7 @@ const doubleSearch = {
 };
 
 describe('Generate corpus', async () => {
-  it.skip('test saving a corpus of 10 documents from a Google SERP', async () => {
+  it('test saving a corpus of 10 documents from a Google SERP', async () => {
     try {
       await saveCorpus(simpleSearch, './test', false);
 
@@ -75,7 +75,7 @@ describe('Generate corpus', async () => {
     }
   });
 
-  it.skip('test building a corpus of 100 documents', async () => {
+  it('test building a corpus of 100 documents', async () => {
     try {
       const corpus = await generateCorpus(search100);
 
