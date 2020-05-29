@@ -1,6 +1,6 @@
 {
   "name": "generate-corpus",
-  "version": "2.1.5",
+  "version": "2.1.6",
   "description": "Generate a corpus based on a Google search or from a set of urls",
   "main": "index.js",
   "repository": {
@@ -27,7 +27,8 @@
     "eslint-config-adidas-es8": "^1.2.0",
     "eslint-plugin-import": "^2.20.2",
     "eslint-plugin-promise": "^4.2.1",
-    "mocha": "^6.2.3"
+    "mocha": "^6.2.3",
+    "simple-proxies": "^1.0.3"
   },
   "author": "Christophe Lombart",
   "license": "Apache"
