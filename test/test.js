@@ -63,7 +63,7 @@ describe('Generate corpus', async () => {
     }
   });
 
-  it('test building a corpus of 20 documents with duplicate docs from a Google SERP', async () => {
+  it.skip('test building a corpus of 20 documents with duplicate docs from a Google SERP', async () => {
     try {
       const corpus = await generateCorpus(doubleSearch);
 
@@ -75,7 +75,7 @@ describe('Generate corpus', async () => {
     }
   });
 
-  it('test building a corpus of 100 documents', async () => {
+  it.skip('test building a corpus of 100 documents', async () => {
     try {
       const corpus = await generateCorpus(search100);
 
