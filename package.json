@@ -19,7 +19,7 @@
     "find-main-content": "^1.2.0",
     "natural-content": "^1.2.3",
     "request-promise-native": "^1.0.8",
-    "serp": "^2.0.2"
+    "serp": "^2.2.2"
   },
   "devDependencies": {
     "chai": "^4.3.6",
